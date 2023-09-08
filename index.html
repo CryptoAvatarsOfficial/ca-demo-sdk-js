@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>VIPE DEMO</title>
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/@vipeio/sdk@0.0.2/lib/vipeio.js"></script>
+    <!-- <script src="https://unpkg.com/browse/@pixiv/three-vrm@2.0.2/lib/three-vrm.module.js"></script> -->
+
+    <style>
+        canvas {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+    </style>
+
+    <script type="module">
+        import * as THREE from 'https://cdn.skypack.dev/three@0.129.0/build/three.module.js';
+        import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
+        import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js';
+        import { VRM, VRMLoaderPlugin, VRMUtils } from "https://unpkg.com/browse/@pixiv/three-vrm@2.0.2/lib/three-vrm.module.js";
+
+        let vrmModel;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight);
+        const Alight = new THREE.AmbientLight(0xFFFFFF, 1);
+        const Dlight = new THREE.DirectionalLight(0xFFFFFF, 1);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor("#E3E3E3");
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.physicallyCorrectLights = true;
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1;
+
+        camera.position.z = 3.5;
+        camera.position.y = 1.5;
+
+        camera.add(Dlight);
+        camera.add(Alight);
+        camera.updateProjectionMatrix();
+
+        scene.add(Dlight);
+        scene.add(Alight);
+        scene.add(camera);
+
+        // add grid floor
+        const grid = new THREE.GridHelper(10, 10, 0x000000, 0x000000);
+        scene.add(grid);
+
+        renderer.render(scene, camera);
+
+        const repaint = () => {
+            requestAnimationFrame(repaint);
+
+            var delta = clock.getDelta();
+
+            if (mixerVrm) {
+                mixerVrm.update(delta);
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+
+            if (camera.position.y < 0.12)
+                camera.position.y = 0.12;
+            if (camera.position.y > 3.5)
+                camera.position.y = 3.5;
+        }
+
+        window.onload = function () {
+            document.body.appendChild(renderer.domElement);
+        }
+
+        const loadVRM = (url) => {
+            const gltfLoader = new GLTFLoader();
+            gltfLoader.register((parser) => new VRMLoaderPlugin(parser));
+            gltfLoader.load(url, (gltf) => {
+                const vrm = gltf.userData.vrm;
+                if (vrmModel) {
+                    scene.remove(vrmModel);
+                }
+
+                vrmModel = gltf.scene;
+                scene.add(vrmModel);
+            });
+        }
+
+        function openAvatarSelector() {
+            const ca = new VipeIO.CryptoAvatars({ apikey: "$2b$10$EfHC7O4G9bqfqxrsrDfAPesR1napi3.4NVX3y6cTrjlO2Qfh4P6iy", avatarSelectorConfig: { mode: "iframe" } });
+            ca.openAvatarSelector((nft, url) => {
+                console.log("AVATAR SELECTED", { nft, url })
+                loadVRM(url);
+            });
+        }
+
+        window.openAvatarSelector = openAvatarSelector;
+
+    </script>
+
+    <script>
+
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <h1>VIPE DEMO</h1>
+        <button onclick="openAvatarSelector()">CHOOSE AVATAR</button>
+    </div>
+
+</html>
