@@ -6,10 +6,6 @@
     <title>VIPE DEMO</title>
     <link rel="stylesheet" href="style.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://unpkg.com/@vipeio/sdk@0.0.2/lib/vipeio.js"></script>
-    <!-- <script src="https://unpkg.com/browse/@pixiv/three-vrm@2.0.2/lib/three-vrm.module.js"></script> -->
-
     <style>
         canvas {
             width: 100%;
@@ -21,18 +17,28 @@
         }
     </style>
 
-    <script type="module">
-        import * as THREE from 'https://cdn.skypack.dev/three@0.129.0/build/three.module.js';
-        import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
-        import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js';
-        import { VRM, VRMLoaderPlugin, VRMUtils } from "https://unpkg.com/browse/@pixiv/three-vrm@2.0.2/lib/three-vrm.module.js";
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.154.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.154.0/examples/jsm/"
+        }
+    }
+    </script>
 
-        let vrmModel;
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { CryptoAvatars } from 'https://unpkg.com/@vipeio/sdk@0.0.6/dist/index.js';
+        import { VRMLoaderPlugin, VRMUtils } from "https://unpkg.com/@pixiv/three-vrm@2.0.2/lib/three-vrm.module.js";
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight);
         const Alight = new THREE.AmbientLight(0xFFFFFF, 1);
         const Dlight = new THREE.DirectionalLight(0xFFFFFF, 1);
+
+        let vrmModel;
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -52,24 +58,26 @@
         camera.add(Alight);
         camera.updateProjectionMatrix();
 
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.target = new THREE.Vector3(0, 1.5, 0);
+
         scene.add(Dlight);
         scene.add(Alight);
         scene.add(camera);
 
-        // add grid floor
         const grid = new THREE.GridHelper(10, 10, 0x000000, 0x000000);
         scene.add(grid);
 
         renderer.render(scene, camera);
 
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+
         const repaint = () => {
             requestAnimationFrame(repaint);
-
-            var delta = clock.getDelta();
-
-            if (mixerVrm) {
-                mixerVrm.update(delta);
-            }
 
             controls.update();
             renderer.render(scene, camera);
@@ -89,9 +97,13 @@
             gltfLoader.register((parser) => new VRMLoaderPlugin(parser));
             gltfLoader.load(url, (gltf) => {
                 const vrm = gltf.userData.vrm;
+                VRMUtils.rotateVRM0(vrm);
+
                 if (vrmModel) {
                     scene.remove(vrmModel);
                 }
+
+                console.log("VRM", vrm);
 
                 vrmModel = gltf.scene;
                 scene.add(vrmModel);
@@ -99,7 +111,7 @@
         }
 
         function openAvatarSelector() {
-            const ca = new VipeIO.CryptoAvatars({ apikey: "$2b$10$EfHC7O4G9bqfqxrsrDfAPesR1napi3.4NVX3y6cTrjlO2Qfh4P6iy", avatarSelectorConfig: { mode: "iframe" } });
+            const ca = new CryptoAvatars({ apiKey: "$2b$10$EfHC7O4G9bqfqxrsrDfAPesR1napi3.4NVX3y6cTrjlO2Qfh4P6iy", avatarSelectorConfig: { mode: "iframe" } });
             ca.openAvatarSelector((nft, url) => {
                 console.log("AVATAR SELECTED", { nft, url })
                 loadVRM(url);
@@ -107,10 +119,7 @@
         }
 
         window.openAvatarSelector = openAvatarSelector;
-
-    </script>
-
-    <script>
+        repaint();
 
     </script>
 </head>
