@@ -1,9 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm';
-import { CryptoAvatars } from '@vipeio/sdk';
+import { Vipe } from '@vipeio/sdk';
+import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import * as THREE from 'three';
 
 @Component({
     selector: 'app-root',
@@ -11,7 +11,9 @@ import * as THREE from 'three';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-    
+
+    private readonly vipe = new Vipe({ apiKey: "$2b$10$EfHC7O4G9bqfqxrsrDfAPesR1napi3.4NVX3y6cTrjlO2Qfh4P6iy", avatarSelectorConfig: { mode: "iframe" } });
+
     private readonly scene = new THREE.Scene();
     private readonly camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight);
     private readonly Alight = new THREE.AmbientLight(0xFFFFFF, 1);
@@ -55,8 +57,7 @@ export class AppComponent {
     }
 
     openAvatarSelector() {
-        const ca = new CryptoAvatars({ apiKey: "$2b$10$EfHC7O4G9bqfqxrsrDfAPesR1napi3.4NVX3y6cTrjlO2Qfh4P6iy", avatarSelectorConfig: { mode: "iframe" } });
-        ca.openAvatarSelector((nft, url) => {
+        this.vipe.openAvatarSelector((nft, url) => {
             console.log("AVATAR SELECTED", { nft, url })
             this.loadVRM(url);
         });
