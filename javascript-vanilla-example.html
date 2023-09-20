@@ -30,8 +30,10 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-        import { CryptoAvatars } from 'https://unpkg.com/@vipeio/sdk@0.0.6/dist/index.js';
+        import { Vipe } from 'https://unpkg.com/@vipeio/sdk@1.0.2/dist/index.js';
         import { VRMLoaderPlugin, VRMUtils } from "https://unpkg.com/@pixiv/three-vrm@2.0.2/lib/three-vrm.module.js";
+
+        const vipe = new Vipe({ apiKey: "$2b$10$EfHC7O4G9bqfqxrsrDfAPesR1napi3.4NVX3y6cTrjlO2Qfh4P6iy", avatarSelectorConfig: { mode: "iframe" } });
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight);
@@ -111,8 +113,7 @@
         }
 
         function openAvatarSelector() {
-            const ca = new CryptoAvatars({ apiKey: "$2b$10$EfHC7O4G9bqfqxrsrDfAPesR1napi3.4NVX3y6cTrjlO2Qfh4P6iy", avatarSelectorConfig: { mode: "iframe" } });
-            ca.openAvatarSelector((nft, url) => {
+            vipe.openAvatarSelector((nft, url) => {
                 console.log("AVATAR SELECTED", { nft, url })
                 loadVRM(url);
             });
