@@ -1,15 +1,12 @@
 {
-  "name": "angular-needle-ssr",
+  "name": "vipe-angular-example",
   "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port 4200",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "coverage": "ng test --no-watch --code-coverage",
-    "serve": "node server",
-    "lint": "ng lint"
+    "test": "ng test"
   },
   "private": true,
   "dependencies": {
@@ -21,7 +18,7 @@
     "@angular/router": "16.0.3",
     "@angular/platform-browser-dynamic": "16.0.3",
     "@pixiv/three-vrm": "2.0.2",
-    "@vipeio/sdk": "^0.0.6",
+    "@vipeio/sdk": "1.0.1",
     "rxjs": "7.8.1",
     "three": "0.154.0",
     "tslib": "2.5.2",
