@@ -44,17 +44,6 @@ vipeSdk.getOpenSourceAvatars()
   });
 ```
 
-### Select an Avatar
-
-To allow users to select an avatar, you can open an avatar selector:
-
-```javascript
-vipeSdk.openAvatarSelector((avatar, vrmUrl) => {
-  console.log('Selected Avatar:', avatar);
-  console.log('VRM URL:', vrmUrl);
-});
-```
-
 ## Available Methods
 
 ### `getAvatar(network, contractAddress, tokenId)`
@@ -93,6 +82,44 @@ The SDK utilizes various types and enumerations that can be helpful in your impl
 - `NFTCollection`: Defines an NFT collection with its details.
 - `NFTFilter`: Provides filtering options for NFT queries.
 - `Pagination`: Contains constants related to pagination.
+
+### Select an Avatar
+
+To allow users to select an avatar, you can open an avatar selector, you can open it as new Window or like a dialog inside your webpage,
+depending the configuration used in Vipe constructor. 
+
+```javascript
+const vipeSdk = new Vipe({
+  apiKey: 'YOUR_API_KEY',
+  avatarsPerPage: 24,
+  avatarSelectorConfig: { mode: "iframe | window" }
+});
+
+vipeSdk.openAvatarSelector((avatar, vrmUrl) => {
+  console.log('Selected Avatar:', avatar);
+  console.log('VRM URL:', vrmUrl);
+});
+```
+
+This will open an avatar selector UI, using Vipe login method. You will be able to enter as guest to see Open Source avatars.
+
+#### Example page
+![alt](./images/page_init.png)
+
+#### Vipe oauth
+![alt](./images/page_login_vipe.png)
+
+#### Open source avatar
+![alt](./images/page_as_guest_only_opensource.png)
+
+#### Owned avatars
+![alt](./images/page_owned_avatars.png)
+
+#### Avatar details
+![alt](./images/page_avatar_details.png)
+
+#### Avatar loaded
+![alt](./images/page_avatar_loaded.png)
 
 ## Contribution
 
